@@ -1,0 +1,508 @@
+<html>
+
+  <head>
+
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    
+    <title>Lingui-DB</title>
+
+    <style>
+      .container {
+	  text-align: center;
+      }
+      #chart {
+	  max-width: 100%;
+      }
+      .node circle {
+	  stroke: white;
+	  stroke-width: 1.5;
+      }
+      .node text {
+	  font-family: Helvetica, sans-serif;
+	  fill: black;
+	  font-size: 12px;
+      }
+      .link {
+	  stroke: black;
+	  stroke-opacity: 0.6;
+      }
+    </style>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.7.0/d3.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
+    
+  </head>
+
+
+  
+  <body>
+  <select id="threshold">
+	  <option value="0.91" selected="selected"><b>0.91</b> (By default)</option>
+	  <option value="0.92">0.92</option>
+	  <option value="0.93">0.93</option>
+	  <option value="0.95">0.95</option>
+	  <option value="0.99">0.99</option>
+	</select><br/><br/>
+  <select id="lang">
+	  <option value="" selected="selected"><b>All languages</b></option>
+	  <option value="en">English</option>
+	  <option value="fr">French</option>
+	  <option value="de">German</option>
+	  <option value="es">Spanish</option>
+	  <option value="it">Italian</option>
+  </select><br/><br/>
+    <select id="categories">
+    <option value="" selected="selected"><b>All categories</b></option>
+<option value="audio-classification">audio-classification</option>
+<option value="automatic-speech-recognition">automatic-speech-recognition</option>
+<option value="conversational">conversational</option>
+<option value="fill-mask">fill-mask</option>
+<option value="image-classification">image-classification</option>
+<option value="image-segmentation">image-segmentation</option>
+<option value="image-to-text">image-to-text</option>
+<option value="multiple-choice">multiple-choice</option>
+<option value="object-detection">object-detection</option>
+<option value="other">other</option>
+<option value="other-text-search">other-text-search</option>
+<option value="question-answering">question-answering</option>
+<option value="sequence-modeling">sequence-modeling</option>
+<option value="summarization">summarization</option>
+<option value="table-to-text">table-to-text</option>
+<option value="tabular-to-text">tabular-to-text</option>
+<option value="text2text-generation">text2text-generation</option>
+<option value="text-classification">text-classification</option>
+<option value="text-generation-other-code-modeling">text-generation-other-code-modeling</option>
+<option value="text-generation-other-common-sense-inference">text-generation-other-common-sense-inference</option>
+<option value="text-generation-other-discourse-analysis">text-generation-other-discourse-analysis</option>
+<option value="text-generation">text-generation</option>
+<option value="text-retrieval">text-retrieval</option>
+<option value="text-scoring">text-scoring</option>
+<option value="text-to-structured">text-to-structured</option>
+<option value="text-to-tabular">text-to-tabular</option>
+<option value="time-series-forecasting">time-series-forecasting</option>
+<option value="token-classification">token-classification</option>
+<option value="transkation">transkation</option>
+<option value="translation">translation</option>
+<option value="visual-question-answering">visual-question-answering</option>
+<option value="zero-shot-classification">zero-shot-classification</option>
+  </select><br/><br/>
+      <select id="tasks">
+    <option value="" selected="selected"><b>All tasks</b></option>
+<option value="abstractive-qa">abstractive-qa</option>
+<option value="acceptability-classification">acceptability-classification</option>
+<option value="audio-classification-other-automatic-speaker-verification">audio-classification-other-automatic-speaker-verification</option>
+<option value="audio-classification-other-query-by-example-spoken-term-detection">audio-classification-other-query-by-example-spoken-term-detection</option>
+<option value="audio-classification-other-speaker-diarization">audio-classification-other-speaker-diarization</option>
+<option value="audio-emotion-recognition">audio-emotion-recognition</option>
+<option value="audio-intent-classification">audio-intent-classification</option>
+<option value="audio-speaker-identification">audio-speaker-identification</option>
+<option value="closed-domain-qa">closed-domain-qa</option>
+<option value="coreference-resolution">coreference-resolution</option>
+<option value="dialogue-generation">dialogue-generation</option>
+<option value="dialogue-modeling">dialogue-modeling</option>
+<option value="document-retrieval">document-retrieval</option>
+<option value="entity-linking-retrieval">entity-linking-retrieval</option>
+<option value="explanation-generation">explanation-generation</option>
+<option value="extractive-qa">extractive-qa</option>
+<option value="face-detection">face-detection</option>
+<option value="fact-checking">fact-checking</option>
+<option value="fact-checking-retrieval">fact-checking-retrieval</option>
+<option value="fill-mask-other-conversational-curiosity">fill-mask-other-conversational-curiosity</option>
+<option value="hate-speech-detection">hate-speech-detection</option>
+<option value="image-captioning">image-captioning</option>
+<option value="instance-segmentation">instance-segmentation</option>
+<option value="intent-classification">intent-classification</option>
+<option value="keyword-spotting">keyword-spotting</option>
+<option value="language-modeling">language-modeling</option>
+<option value="lemmatization">lemmatization</option>
+<option value="masked-language-modeling">masked-language-modeling</option>
+<option value="multi-class-classification">multi-class-classification</option>
+<option value="multi-class-image-classification">multi-class-image-classification</option>
+<option value="multi-input-text-classification">multi-input-text-classification</option>
+<option value="multi-label-classification">multi-label-classification</option>
+<option value="multi-label-image-classification">multi-label-image-classification</option>
+<option value="multiple-choice-qa">multiple-choice-qa</option>
+<option value="multivariate-time-series-forecasting">multivariate-time-series-forecasting</option>
+<option value="named-entity-recognition">named-entity-recognition</option>
+<option value="natural-language-inference">natural-language-inference</option>
+<option value="news-articles-headline-generation">news-articles-headline-generation</option>
+<option value="news-articles-summarization">news-articles-summarization</option>
+<option value="open-domain-abstractive-qa">open-domain-abstractive-qa</option>
+<option value="open-domain-abstrative-qa">open-domain-abstrative-qa</option>
+<option value="open-domain-qa">open-domain-qa</option>
+<option value="other-audio-slot-filling">other-audio-slot-filling</option>
+<option value="other-compositionality">other-compositionality</option>
+<option value="other-concepts-to-text">other-concepts-to-text</option>
+<option value="other-diacritics-prediction">other-diacritics-prediction</option>
+<option value="other-dialogue-state-tracking">other-dialogue-state-tracking</option>
+<option value="other-image-self-supervised">other-image-self-supervised</option>
+<option value="other-intent-to-text">other-intent-to-text</option>
+<option value="other-multi-turn">other-multi-turn</option>
+<option value="other-neural-search">other-neural-search</option>
+<option value="other-other-citation-recommendation">other-other-citation-recommendation</option>
+<option value="other-other-contextual-embeddings">other-other-contextual-embeddings</option>
+<option value="other-other-Conversational">other-other-Conversational</option>
+<option value="other-other-data-mining">other-other-data-mining</option>
+<option value="other-other-data-to-text-generation">other-other-data-to-text-generation</option>
+<option value="other-other-digital-humanities-research">other-other-digital-humanities-research</option>
+<option value="other-other-disambiguation">other-other-disambiguation</option>
+<option value="other-other-domain-generalization">other-other-domain-generalization</option>
+<option value="other-other-head-pose-estimation">other-other-head-pose-estimation</option>
+<option value="other-other-judgement-prediction">other-other-judgement-prediction</option>
+<option value="other-other-knowledge-base">other-other-knowledge-base</option>
+<option value="other-other-knowledge-extraction">other-other-knowledge-extraction</option>
+<option value="other-other-NCI-PID-PubMed">other-other-NCI-PID-PubMed</option>
+<option value="other-other-open-information-extraction">other-other-open-information-extraction</option>
+<option value="other">other</option>
+<option value="other-other-pretraining-language-models">other-other-pretraining-language-models</option>
+<option value="other-other-query-based-multi-document-summarization">other-other-query-based-multi-document-summarization</option>
+<option value="other-other-raw-dataset">other-other-raw-dataset</option>
+<option value="other-other-relation-extraction">other-other-relation-extraction</option>
+<option value="other-other-sentence-compression">other-other-sentence-compression</option>
+<option value="other-other-sentences">other-other-sentences</option>
+<option value="other-other-story-completion">other-other-story-completion</option>
+<option value="other-other-text-to-speech">other-other-text-to-speech</option>
+<option value="other-other-token-classification-of-text-errors">other-other-token-classification-of-text-errors</option>
+<option value="other-other-translation">other-other-translation</option>
+<option value="other-other-web-search">other-other-web-search</option>
+<option value="other-scene-parsing">other-scene-parsing</option>
+<option value="other-text-search">other-text-search</option>
+<option value="parsing">parsing</option>
+<option value="part-of-speech">part-of-speech</option>
+<option value="part-of-speech-tagging">part-of-speech-tagging</option>
+<option value="question-ansering-other-dialogue-qa">question-ansering-other-dialogue-qa</option>
+<option value="question-answering-other-chained-qa">question-answering-other-chained-qa</option>
+<option value="question-answering-other-conversational-qa">question-answering-other-conversational-qa</option>
+<option value="question-answering-other-explanations-in-question-answering">question-answering-other-explanations-in-question-answering</option>
+<option value="question-answering-other-generative-reading-comprehension-metric">question-answering-other-generative-reading-comprehension-metric</option>
+<option value="question-answering-other-knowledge-base-qa">question-answering-other-knowledge-base-qa</option>
+<option value="question-answering-other-multi-hop">question-answering-other-multi-hop</option>
+<option value="question-answering-other-multihop-tabular-text-qa">question-answering-other-multihop-tabular-text-qa</option>
+<option value="question-answering-other-table-question-answering">question-answering-other-table-question-answering</option>
+<option value="question-answering-other-yes-no-qa">question-answering-other-yes-no-qa</option>
+<option value="question-answering-other-zero-shot-relation-extraction">question-answering-other-zero-shot-relation-extraction</option>
+<option value="rdf-to-text">rdf-to-text</option>
+<option value="relation-extraction">relation-extraction</option>
+<option value="semantic-role-labeling">semantic-role-labeling</option>
+<option value="semantic-similarity-classification">semantic-similarity-classification</option>
+<option value="semantic-similarity-scoring">semantic-similarity-scoring</option>
+<option value="sentiment-analysis">sentiment-analysis</option>
+<option value="sentiment-classification">sentiment-classification</option>
+<option value="sentiment-scoring">sentiment-scoring</option>
+<option value="slot-filling">slot-filling</option>
+<option value="speaker-identification">speaker-identification</option>
+<option value="speaker-language-identification">speaker-language-identification</option>
+<option value="summarization-other-aspect-based-summarization">summarization-other-aspect-based-summarization</option>
+<option value="summarization-other-bills-summarization">summarization-other-bills-summarization</option>
+<option value="summarization-other-conversations-summarization">summarization-other-conversations-summarization</option>
+<option value="summarization-other-email-headline-generation">summarization-other-email-headline-generation</option>
+<option value="summarization-other-extractive-summarization">summarization-other-extractive-summarization</option>
+<option value="summarization-other-hallucinations">summarization-other-hallucinations</option>
+<option value="summarization--other-headline-generation">summarization--other-headline-generation</option>
+<option value="summarization-other-multi-document-summarization">summarization-other-multi-document-summarization</option>
+<option value="summarization-other-paper-abstract-generation">summarization-other-paper-abstract-generation</option>
+<option value="summarization-other-patent-summarization">summarization-other-patent-summarization</option>
+<option value="summarization-other-reddit-posts-summarization">summarization-other-reddit-posts-summarization</option>
+<option value="summarization-other-scientific-documents-summarization">summarization-other-scientific-documents-summarization</option>
+<option value="summarization">summarization</option>
+<option value="text2text-generation-other-code-generation">text2text-generation-other-code-generation</option>
+<option value="text2text-generation-other-common-sense-if-then-reasoning">text2text-generation-other-common-sense-if-then-reasoning</option>
+<option value="text2text-generation-other-concepts-to-text">text2text-generation-other-concepts-to-text</option>
+<option value="text2text-generation-other-debugging">text2text-generation-other-debugging</option>
+<option value="text2text-generation-other-explanation-generation">text2text-generation-other-explanation-generation</option>
+<option value="text2text-generation-other-grammatical-error-correction">text2text-generation-other-grammatical-error-correction</option>
+<option value="text2text-generation-other-intent-to-text">text2text-generation-other-intent-to-text</option>
+<option value="text2text-generation-other-long-range-dependency">text2text-generation-other-long-range-dependency</option>
+<option value="text2text-generation-other-math-word-problems">text2text-generation-other-math-word-problems</option>
+<option value="text2text-generation-other-meaning-representation-to-text">text2text-generation-other-meaning-representation-to-text</option>
+<option value="text2text-generation-other-meaning-representtion-to-text">text2text-generation-other-meaning-representtion-to-text</option>
+<option value="text2text-generation-other-paraphrase-generation">text2text-generation-other-paraphrase-generation</option>
+<option value="text2text-generation-other-poem-generation">text2text-generation-other-poem-generation</option>
+<option value="text2text-generation-other-question-answering">text2text-generation-other-question-answering</option>
+<option value="text2text-generation-other-question-generation">text2text-generation-other-question-generation</option>
+<option value="text2text-generation-other-text-to-sql">text2text-generation-other-text-to-sql</option>
+<option value="text-classification-legal-topic-classification">text-classification-legal-topic-classification</option>
+<option value="text-classification-other-acceptability-classification">text-classification-other-acceptability-classification</option>
+<option value="text-classification-other-aspect-based-sentiment-analysis">text-classification-other-aspect-based-sentiment-analysis</option>
+<option value="text-classification-other-bias-evaluation">text-classification-other-bias-evaluation</option>
+<option value="text-classification-other-binary">text-classification-other-binary</option>
+<option value="text-classification-other-coreference-nli">text-classification-other-coreference-nli</option>
+<option value="text-classification-other-dialog-act-classification">text-classification-other-dialog-act-classification</option>
+<option value="text-classification-other-dialogue-act-classification">text-classification-other-dialogue-act-classification</option>
+<option value="text-classification-other-dialogue-sentiment-classification">text-classification-other-dialogue-sentiment-classification</option>
+<option value="text-classification-other-discourse-marker-prediction">text-classification-other-discourse-marker-prediction</option>
+<option value="text-classification-other-emotion-classification">text-classification-other-emotion-classification</option>
+<option value="text-classification-other-emotion">text-classification-other-emotion</option>
+<option value="text-classification-other-evaluating-dialogue-systems">text-classification-other-evaluating-dialogue-systems</option>
+<option value="text-classification-other-fake-news-detection">text-classification-other-fake-news-detection</option>
+<option value="text-classification-other-funnier-headline-identification">text-classification-other-funnier-headline-identification</option>
+<option value="text-classification-other-funniness-score-prediction">text-classification-other-funniness-score-prediction</option>
+<option value="text-classification-other-gender-bias">text-classification-other-gender-bias</option>
+<option value="text-classification-other-hate-speech-detection">text-classification-other-hate-speech-detection</option>
+<option value="text-classification-other-hate-speech-topic-classification">text-classification-other-hate-speech-topic-classification</option>
+<option value="text-classification-other-Hate">text-classification-other-Hate</option>
+<option value="text-classification-other-headline-grouping">text-classification-other-headline-grouping</option>
+<option value="text-classification-other-hope-speech-classification">text-classification-other-hope-speech-classification</option>
+<option value="text-classification-other-Hope">text-classification-other-Hope</option>
+<option value="text-classification-other-judgement-prediction">text-classification-other-judgement-prediction</option>
+<option value="text-classification-other-knowledge-verification">text-classification-other-knowledge-verification</option>
+<option value="text-classification-other-language-identification">text-classification-other-language-identification</option>
+<option value="text-classification-other-legal-judgment-prediction">text-classification-other-legal-judgment-prediction</option>
+<option value="text-classification-other-Meronym-Prediction">text-classification-other-Meronym-Prediction</option>
+<option value="text-classification-other-narrative-flow">text-classification-other-narrative-flow</option>
+<option value="text-classification-other-news-category-classification">text-classification-other-news-category-classification</option>
+<option value="text-classification-other-offensive-language-classification">text-classification-other-offensive-language-classification</option>
+<option value="text-classification-other-offensive-language">text-classification-other-offensive-language</option>
+<option value="text-classification-other-paraphrase-identification">text-classification-other-paraphrase-identification</option>
+<option value="text-classification-other-poetry-classification">text-classification-other-poetry-classification</option>
+<option value="text-classification-other-probing">text-classification-other-probing</option>
+<option value="text-classification-other-propaganda-technique-classification">text-classification-other-propaganda-technique-classification</option>
+<option value="text-classification-other-qa-nli">text-classification-other-qa-nli</option>
+<option value="text-classification-other-question-answer-pair-classification">text-classification-other-question-answer-pair-classification</option>
+<option value="text-classification-other-question-identification">text-classification-other-question-identification</option>
+<option value="text-classification-other-rationale-extraction">text-classification-other-rationale-extraction</option>
+<option value="text-classification-other-sarcasm-detection">text-classification-other-sarcasm-detection</option>
+<option value="text-classification-other-simplification-evaluation">text-classification-other-simplification-evaluation</option>
+<option value="text-classification-other-social-media-shares-prediction">text-classification-other-social-media-shares-prediction</option>
+<option value="text-classification-other-stance-detection">text-classification-other-stance-detection</option>
+<option value="text-classification-other-stereotype-detection">text-classification-other-stereotype-detection</option>
+<option value="text-classification-other-toxicity-prediction">text-classification-other-toxicity-prediction</option>
+<option value="text-classification-other-translation-quality-estimation">text-classification-other-translation-quality-estimation</option>
+<option value="text-classification-other-word-sense-disambiguation">text-classification-other-word-sense-disambiguation</option>
+<option value="text-classification-other-Word">text-classification-other-Word</option>
+<option value="text-generation">text-generation</option>
+<option value="text-retrieval-other-document-to-document-retrieval">text-retrieval-other-document-to-document-retrieval</option>
+<option value="text-retrieval-other-parallel-sentence-retrieval">text-retrieval-other-parallel-sentence-retrieval</option>
+<option value="text-scoring-other-evaluating-dialogue-systems">text-scoring-other-evaluating-dialogue-systems</option>
+<option value="text-scoring-other-rating">text-scoring-other-rating</option>
+<option value="text-scoring">text-scoring</option>
+<option value="text-simplification">text-simplification</option>
+<option value="token-classification-other-acronym-identification">token-classification-other-acronym-identification</option>
+<option value="token-classification-other-clause-segmentation">token-classification-other-clause-segmentation</option>
+<option value="token-classification-other-constituency-parsing">token-classification-other-constituency-parsing</option>
+<option value="token-classification-other-conversation-disentanglement">token-classification-other-conversation-disentanglement</option>
+<option value="token-classification-other-dependency-parsing">token-classification-other-dependency-parsing</option>
+<option value="token-classification-other-fused-head-identification">token-classification-other-fused-head-identification</option>
+<option value="token-classification-other-keyphrase-extraction">token-classification-other-keyphrase-extraction</option>
+<option value="token-classification-other-lemmatization">token-classification-other-lemmatization</option>
+<option value="token-classification-other-morphology">token-classification-other-morphology</option>
+<option value="token-classification-other-output-structure">token-classification-other-output-structure</option>
+<option value="token-classification-other-propaganda-span-identification">token-classification-other-propaganda-span-identification</option>
+<option value="token-classification-other-relation-extraction">token-classification-other-relation-extraction</option>
+<option value="token-classification-other-relation-prediction">token-classification-other-relation-prediction</option>
+<option value="token-classification-other-sentence-segmentation">token-classification-other-sentence-segmentation</option>
+<option value="token-classification-other-span-extraction">token-classification-other-span-extraction</option>
+<option value="token-classification-other-word-segmentation">token-classification-other-word-segmentation</option>
+<option value="token-classification-other-word-tokenization">token-classification-other-word-tokenization</option>
+<option value="topic-classification">topic-classification</option>
+<option value="translaiton-other-dissertation-abstracts-translation">translaiton-other-dissertation-abstracts-translation</option>
+<option value="translaiton-other-theses-translation">translaiton-other-theses-translation</option>
+<option value="translation-other-business-conversations-translation">translation-other-business-conversations-translation</option>
+<option value="translation-other-code-documentation-translation">translation-other-code-documentation-translation</option>
+<option value="translation-other-code-to-code">translation-other-code-to-code</option>
+<option value="translation-other-code-to-text">translation-other-code-to-text</option>
+<option value="translation-other-text-to-code">translation-other-text-to-code</option>
+<option value="translation-other-tweets-translation">translation-other-tweets-translation</option>
+<option value="univariate-time-series-forecasting">univariate-time-series-forecasting</option>
+<option value="utterance-retrieval">utterance-retrieval</option>
+<option value="visual-question-answering">visual-question-answering</option>
+<option value="word-sense-disambiguation">word-sense-disambiguation</option>
+
+  </select><br/><br/>
+	<button onclick="draw(document.getElementById('threshold').value,document.getElementById('lang').value,document.getElementById('categories').value,document.getElementById('tasks').value)">See!</button>
+    <div class="container">
+      <svg id="chart"></svg>
+    </div>
+
+
+    <script>
+      // Setup the color function
+const scale = d3.scaleOrdinal(d3.schemeCategory10)
+const color = d => scale(d.id[0])
+
+// Set the visualization size
+let height = 1000 //400
+let width = 1300 //400
+
+
+// Setup the svg element using viewBox
+const svg = d3.select("#chart")
+      //.attr("viewBox", [-width / 2, -height / 2, width, height/3])
+    .attr("height",height).attr("width",width)
+    //.attr("viewBox", [0,0,100,100])
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("scale",10)
+    //.call(d3.zoom().on("zoom", (event) => {
+	//svg.attr("transform", "translate(" + event.translate + ")" + " scale(" + event.scale + ")");
+      //svg.attr("transform", event.transform);
+    //}))
+
+      
+    //.append("svg")
+    //.attr("width", "100%")
+    //.attr("viewBox", "0 0 10 10")
+
+    function draw(threshold,langFlag,category,task){
+    d3.selectAll("svg > *").remove();
+    
+// Request the JSON similarity graph object from GitHub
+      axios.get('https://raw.githubusercontent.com/dgraux/Lingui-DB/master/lingui-db-v1.1.json')
+  .then(response => {
+
+    // Parse the graph object
+      //let data = JSON.parse(response)
+      let data = response.data;
+
+    
+    // Prune links that don't meet a threshold
+    //let minSimilarity = 0.91
+    let minSimilarity = threshold
+    data.links = data.links.filter(link => {
+	return ( link.weight > minSimilarity && link.weight != 1 )
+    })
+    
+      // Filter nodes according to users' choices
+      // First languages !
+      //let langFlag = "fr"
+      if ( langFlag != "" ) {
+        data.nodes = data.nodes.filter(node => {
+            return (node.data.language.includes(langFlag))
+        })
+      }
+      // Then categories !
+      if ( category != "" ) {
+        data.nodes = data.nodes.filter(node => {
+            return (node.data.categories.includes(category))
+        })
+      }
+      // Now tasks !
+      if ( task != "" ) {
+        data.nodes = data.nodes.filter(node => {
+            return (node.data.tasks.includes(task))
+        })
+      }
+      
+    // Further filter the links to keep only the ones
+    // having a source and a target within the filtered
+    // set of nodes.
+    data.links = data.links.filter(link => {
+        var searchSource = 0
+        var searchTarget = 0
+        for (i=0; i<data.nodes.length;i++){
+            if(link.source == data.nodes[i].id) { searchSource = 1 }
+            if(link.target == data.nodes[i].id) { searchTarget = 1 }
+        }
+        return ( searchSource && searchTarget )
+    })
+        
+    // For ease of reference
+    const links = data.links
+    const nodes = data.nodes
+    console.log(data.nodes)
+    console.log(data.links)
+    
+    // Setup simulation (how nodes move around)
+    const simulation = d3.forceSimulation(nodes)
+	  .force("link", d3.forceLink(links).id(d => d.id))
+	  .force("charge", d3.forceManyBody().strength(-45))
+	  .force('center', d3.forceCenter(width/2, height/2))
+          // Since this is a disjoint graph, using 
+	  .force("x", d3.forceX([width/4]))
+	  .force("y", d3.forceY([height/4]))
+	  .velocityDecay(0.25)
+      
+      
+    // Setup the drag function that controls the drag behavior
+    function dragstarted(event) {
+      if (!event.active) simulation.alphaTarget(0.3).restart()
+      event.subject.fx = event.subject.x
+      event.subject.fy = event.subject.y
+    }
+
+    function dragged(event) {
+      event.subject.fx = event.x
+      event.subject.fy = event.y
+    }
+
+    function dragended(event) {
+      if (!event.active) simulation.alphaTarget(0)
+      event.subject.fx = null;
+      event.subject.fy = null;
+    }
+
+    let drag = d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended)
+
+    // Create a container and line for each link
+    const link = svg.append("g")
+      .attr("class", "link")
+      .selectAll("line")
+      .data(links)
+      .join("line")
+        .attr("stroke-width", d => d.weight * 5)
+        .attr("stroke-opacity", d => ((d.weight - minSimilarity) * (1/minSimilarity) + 0.1))
+
+    // Create a container for each node
+    const node = svg.append("g")
+      .selectAll(".node")
+      .data(nodes)
+      .join("g")
+      .attr("class", "node")
+      .call(drag) // Attach the drag behavior to each node
+      .on("mouseenter", (evt, d) => {
+	  link
+              .attr("display", "none")
+              .filter(l => l.source.id === d.id || l.target.id === d.id)
+              .attr("display", "block")
+	      .style("stroke","red")
+	      .style("stroke-opacity",1)
+	      .style("stroke-width",5);
+      })
+      .on("mouseleave", evt => {
+	  link.attr("display", "block")
+	      .style("stroke-width", d => d.weight * 5)
+              .style("stroke-opacity", d => ((d.weight - minSimilarity) * (1/minSimilarity) + 0.1))
+	      .style("stroke","black");
+      })
+      
+    // Add a circle to each node container
+    node.append("circle")
+      .attr("r", 5)
+      .attr("fill", color)
+
+    // Add a label to each node container
+    node.append("text")
+	  .text(function(d) {
+              return d.id;
+	  })
+	  .attr('x', 6)
+	  .attr('y', 3)
+	  .append("title")
+      	  .text(d => d.id)
+      
+    // Update the network visualization based on the simulation
+    simulation.on("tick", () => {
+      // Move the links to their new position
+      link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y)
+        
+      // Move the nodes to their new position
+      node.attr("transform", d => `translate(${d.x}, ${d.y})`)
+      })
+  })
+
+  }
+  
+  draw(0.91,"","","")
+  
+    </script>
+
+  </body>
+  
+</html>
