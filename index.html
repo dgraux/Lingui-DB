@@ -104,8 +104,11 @@
   
   <body>
   
-
+    <h2>Lingui-DB</h2>
+    <hr align="left" width="130" noshade>
     <span style="font-size:60px;cursor:pointer" onclick="openNav()">&#9776;</span>
+    &nbsp;&nbsp;&nbsp;
+    <span style="font-size:45px;cursor:pointer" onclick="openNav()">?</span>
     <div id="myNav" class="overlay">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <div class="overlay-content">
@@ -546,9 +549,11 @@ const svg = d3.select("#chart")
               .style("stroke-opacity", d => ((d.weight - minSimilarity) * (1/minSimilarity) + 0.1))
 	      .style("stroke","black");
       })
-      .on('dblclick', connectedNodes) //Added code
-.on("mouseover", tooltip_in) // when the mouse hovers a node, call the tooltip_in function to create the tooltip
-    .on("mouseout", tooltip_out) // when the mouse stops hovering a node, call the tooltip_out function to get rid of the tooltip
+      .on('dblclick',highlight_tooltip)
+      //.on('dblclick', connectedNodes) //Added code
+    //.on("mouseover", tooltip_in) // when the mouse hovers a node, call the tooltip_in function to create the tooltip
+    //.on("mouseout", tooltip_out) // when the mouse stops hovering a node, call the tooltip_out function to get rid of the tooltip
+    
       
     // Add a circle to each node container
     node.append("circle")
@@ -582,7 +587,42 @@ const svg = d3.select("#chart")
       
       //---Insert-------
 
-      tooltip = d3
+//Toggle stores whether the highlighting is on
+var toggle = 0;
+//Create an array logging what is connected to what
+var linkedByIndex = {};
+for (i = 0; i < nodes.length; i++) {
+    linkedByIndex[i + "," + i] = 1;
+};
+links.forEach(function (d) {
+    linkedByIndex[d.source.index + "," + d.target.index] = 1;
+});
+//This function looks up whether a pair are neighbours  
+function neighboring(a, b) {
+    return linkedByIndex[a.index + "," + b.index];
+}
+function connectedNodes(event, d) {
+    if (toggle == 0) {
+        //Reduce the opacity of all but the neighbouring nodes
+        //d = d3.select(this).node().__data__; console.log(d);
+        node.style("opacity", function (o) {
+            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
+        });
+        link.style("opacity", function (o) {
+            return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+        });        
+        //Reduce the op
+        toggle = 1;
+    } else {
+        //Put them back to opacity=1
+        node.style("opacity", 1);
+        link.style("opacity", 1);
+        toggle = 0;
+    }
+}
+
+
+     tooltip = d3
   .select("body")
   .append("div") // the tooltip always "exists" as its own html div, even when not visible
   .style("position", "absolute") // the absolute position is necessary so that we can manually define its position later
@@ -606,41 +646,17 @@ function tooltip_out () {
     .duration(50) // give the hide behavior a 50 milisecond delay so that it doesn't jump around as the network moves
     .style("visibility", "hidden"); // hide the tooltip when the mouse stops hovering
 }
-      
-      
-//Toggle stores whether the highlighting is on
-var toggle = 0;
-//Create an array logging what is connected to what
-var linkedByIndex = {};
-for (i = 0; i < nodes.length; i++) {
-    linkedByIndex[i + "," + i] = 1;
-};
-links.forEach(function (d) {
-    linkedByIndex[d.source.index + "," + d.target.index] = 1;
-});
-//This function looks up whether a pair are neighbours  
-function neighboring(a, b) {
-    return linkedByIndex[a.index + "," + b.index];
+
+
+function tooltip_manager(event, d) {
+    if (toggle == 0) { tooltip_in(event,d) } else { tooltip_out() }
 }
-function connectedNodes() {
-    if (toggle == 0) {
-        //Reduce the opacity of all but the neighbouring nodes
-        d = d3.select(this).node().__data__;
-        node.style("opacity", function (o) {
-            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
-        });
-        link.style("opacity", function (o) {
-            return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
-        });        
-        //Reduce the op
-        toggle = 1;
-    } else {
-        //Put them back to opacity=1
-        node.style("opacity", 1);
-        link.style("opacity", 1);
-        toggle = 0;
-    }
+
+function highlight_tooltip (event,d) {
+    tooltip_manager(event,d)
+    connectedNodes(event,d)
 }
+
 //---End Insert---
       
   }) // End of axios callback function
