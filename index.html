@@ -94,6 +94,7 @@
     padding: 5px;
     border-radius: 5px;
     border: 1px solid grey;
+    max-width: 30%;
   }
 
 </style>
@@ -633,10 +634,12 @@ function connectedNodes(event, d) {
 function build_tooltip_content(d) {
     content = ""
     content += "<h3 style=\"text-align:center\"><a href=\"" + d.data.url + "\" target=\"_blank\">" + d.id + "</a></h3>" // Title
+    content += "<div style=\"text-align: right\"> "+ d.data.categories.toString().replaceAll(",","<br>") + "</div>"
     content += "<hr>" // Separator
-    content += d.data.language.toString()
+    content += "<b>Languages:</b> " + d.data.language.toString().replaceAll(",",", ")
     content += "<hr>" // Separator
-    content += "<p style=\"text-align:justify\">" + d.data.description + "</p>" // Description
+    content += "<b>Description</b><p style=\"text-align:justify\">" + d.data.description + "</p>" // Description
+    //content += "<hr>" // Separator
     return content
 }
   
