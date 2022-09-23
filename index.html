@@ -623,15 +623,24 @@ function connectedNodes(event, d) {
 }
 
 
-     tooltip = d3
-  .select("body")
-  .append("div") // the tooltip always "exists" as its own html div, even when not visible
-  .style("position", "absolute") // the absolute position is necessary so that we can manually define its position later
-  .style("visibility", "hidden") // hide it from default at the start so it only appears on hover
-  .style("background-color", "white")
-  .attr("class", "tooltip")
+     tooltip_info = d3
+        .select("body")
+        .append("div") // the tooltip always "exists" as its own html div, even when not visible
+        .style("position", "absolute") // the absolute position is necessary so that we can manually define its position later
+        .style("visibility", "hidden") // hide it from default at the start so it only appears on hover
+        .style("background-color", "white")
+        .attr("class", "tooltip")
+        
+    tooltip_citation = d3
+        .select("body")
+        .append("div") // the tooltip always "exists" as its own html div, even when not visible
+        .style("position", "absolute") // the absolute position is necessary so that we can manually define its position later
+        .style("visibility", "hidden") // hide it from default at the start so it only appears on hover
+        .style("background-color", "white")
+        .attr("class", "tooltip")
   
-function build_tooltip_content(d) {
+  
+function build_tooltip_info_content(d) {
     content = ""
     content += "<h3 style=\"text-align:center\"><a href=\"" + d.data.url + "\" target=\"_blank\">" + d.id + "</a></h3>" // Title
     content += "<div style=\"text-align: right\"> "+ d.data.categories.toString().replaceAll(",","<br>") + "</div>"
@@ -639,14 +648,13 @@ function build_tooltip_content(d) {
     content += "<b>Languages:</b> " + d.data.language.toString().replaceAll(",",", ")
     content += "<hr>" // Separator
     content += "<b>Description</b><p style=\"text-align:justify\">" + d.data.description + "</p>" // Description
-    //content += "<hr>" // Separator
     return content
 }
   
   //name a tooltip_in function to call when the mouse hovers a node
-function tooltip_in(event, d) { // pass event and d to this function so that it can access d for our data
-  return tooltip
-    .html(build_tooltip_content(d))
+function tooltip_info_in(event, d) { // pass event and d to this function so that it can access d for our data
+  return tooltip_info
+    .html(build_tooltip_info_content(d))
     //.html("<h4>" + d.id + "</h4>") // add an html element with a header tag containing the name of the node.  This line is where you would add additional information like: "<h4>" + d.name + "</h4></br><p>" + d.type + "</p>"  Note the quote marks, pluses and </br>--these are necessary for javascript to put all the data and strings within quotes together properly.  Any text needs to be all one line in .html() here
     .style("visibility", "visible") // make the tooltip visible on hover
     .style("top", (event.pageY-150) + "px") // position the tooltip with its top at the same pixel location as the mouse on the screen
@@ -654,8 +662,22 @@ function tooltip_in(event, d) { // pass event and d to this function so that it 
 }
 
 // name a tooltip_out function to call when the mouse stops hovering
-function tooltip_out () {
-  return tooltip
+function tooltip_info_out () {
+  return tooltip_info
+    .transition()
+    .duration(400) // give the hide behavior a 400 milisecond delay so that it doesn't jump around as the network moves
+    .style("visibility", "hidden"); // hide the tooltip when the mouse stops hovering
+}
+
+function tooltip_citation_in(event, d) {
+  return tooltip_citation
+    .html("<h3>"+d.id+" citation network</h3>")
+    .style("visibility", "visible") // make the tooltip visible on hover
+    .style("top", (event.pageY+100) + "px") // position the tooltip with its top at the same pixel location as the mouse on the screen
+    .style("right", (event.pageX) + "px"); // position the tooltip just to the right of the mouse location
+}
+function tooltip_citation_out () {
+  return tooltip_citation
     .transition()
     .duration(400) // give the hide behavior a 400 milisecond delay so that it doesn't jump around as the network moves
     .style("visibility", "hidden"); // hide the tooltip when the mouse stops hovering
@@ -663,7 +685,7 @@ function tooltip_out () {
 
 
 function tooltip_manager(event, d) {
-    if (toggle == 0) { tooltip_in(event,d) } else { tooltip_out() }
+    if (toggle == 0) { tooltip_info_in(event,d) ; tooltip_citation_in(event,d) } else { tooltip_info_out() ; tooltip_citation_out() }
 }
 
 function highlight_tooltip (event,d) {
